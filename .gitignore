@@ -1,0 +1,6 @@
+storage/net/femoz/*
+!storage/net/femoz/cluster-init
+!storage/net/femoz/haproxy
+rest-client
+work-in-progress
+.env

@@ -1,0 +1,1 @@
+storage/net/femoz/cluster-init/docker-entrypoint-initdb.d/data/*.json filter=lfs diff=lfs merge=lfs -text
