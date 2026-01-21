@@ -28,6 +28,7 @@ for DIRECTORY in "${DIRECTORIES[@]}"; do
   else
     echo "Adresář neexistuje, přeskakuji: $DIRECTORY"
   fi
+  echo "Zakládám adresář: $DIRECTORY"
   mkdir -p "$DIRECTORY"
 done
 
