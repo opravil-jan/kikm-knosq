@@ -1,29 +1,29 @@
-db = db.getSiblingDB('video_watch_time') 
+db = db.getSiblingDB("video_watch_time");
 
 db.runCommand({
   collMod: "viewers",
-  validationLevel: "off"
+  validationLevel: "off",
 });
 
 db.viewers.updateMany(
   {
-    userId_temporary: { $type: "string" }
+    userId_temporary: { $type: "string" },
   },
   [
     {
       $set: {
-        userId: { $toUUID: "$userId_temporary" }
-      }
+        userId: { $toUUID: "$userId_temporary" },
+      },
     },
     {
-      $unset: "userId_temporary"
-    }
-  ]
+      $unset: "userId_temporary",
+    },
+  ],
 );
 
 db.runCommand({
   collMod: "viewers",
-   validator: {
+  validator: {
     $jsonSchema: {
       bsonType: "object",
       title: "Viewers viewing time",
@@ -31,7 +31,8 @@ db.runCommand({
       properties: {
         userId: {
           bsonType: "binData",
-          description: "'userId' must be a binary data and is required",},
+          description: "'userId' must be a binary data and is required",
+        },
         sidp: {
           bsonType: "long",
           minimum: 10000,
@@ -47,7 +48,6 @@ db.runCommand({
         progress: {
           bsonType: "int",
           minimum: 0,
-          maximum: 172800,
           description: "'progress' shows last video watch time time in second",
         },
         finished: {
@@ -60,5 +60,5 @@ db.runCommand({
     },
   },
   validationLevel: "strict",
-  validationAction: "error"
+  validationAction: "error",
 });

@@ -28,7 +28,6 @@ db.createCollection("devices", {
         progress: {
           bsonType: "int",
           minimum: 0,
-          maximum: 172800,
           description: "'progress' shows last video watch time time in second",
         },
         finished: {
@@ -85,7 +84,6 @@ db.createCollection("viewers", {
         progress: {
           bsonType: "int",
           minimum: 0,
-          maximum: 172800,
           description: "'progress' shows last video watch time time in second",
         },
         finished: {
