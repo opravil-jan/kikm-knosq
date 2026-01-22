@@ -66,8 +66,8 @@ mongoimport \
   --host mongos-01.femoz.net \
   --port 27017 \
   --db video_watch_time \
-  --collection viewers \
-  --file /docker-entrypoint-initdb.d/viewers.json \
+  --collection devices \
+  --file /docker-entrypoint-initdb.d/data/devices.json \
   --jsonArray \
   --stopOnError \
   --verbose
@@ -76,8 +76,8 @@ mongoimport \
   --host mongos-01.femoz.net \
   --port 27017 \
   --db video_watch_time \
-  --collection devices \
-  --file /docker-entrypoint-initdb.d/devices.json \
+  --collection viewers \
+  --file /docker-entrypoint-initdb.d/data/viewers.json \
   --jsonArray \
   --stopOnError \
   --verbose
