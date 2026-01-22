@@ -1,0 +1,196 @@
+<mxfile host="draw-io.femoz.dev" agent="Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0" version="29.2.7">
+  <diagram name="Page-1" id="qWHLqX3zgghXMG52CbWJ">
+    <mxGraphModel dx="3346" dy="1817" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="1YgMQHHs7jZciWGftBQG-24" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;fillColor=#fad9d5;strokeColor=#ae4132;fontSize=16;fontStyle=1" value="Datacenter B" vertex="1">
+          <mxGeometry height="1480" width="750" x="1240" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="1YgMQHHs7jZciWGftBQG-23" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1" value="Datacenter A" vertex="1">
+          <mxGeometry height="1480" width="750" x="450" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="1YgMQHHs7jZciWGftBQG-10" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-4" style="endArrow=classic;html=1;rounded=0;startArrow=classic;startFill=1;" target="FeVo-T80gy2tgNIBbhQ5-17" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1520" y="410" as="sourcePoint" />
+            <mxPoint x="1570" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-39" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-4" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-23" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1110" y="1190" as="sourcePoint" />
+            <mxPoint x="1160" y="1140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-34" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-17" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1090" y="1060" as="sourcePoint" />
+            <mxPoint x="1140" y="1010" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-35" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-23" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1110" y="1200" as="sourcePoint" />
+            <mxPoint x="1160" y="1150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Applications" vertex="1">
+          <mxGeometry height="50" width="370" x="1040" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-2" parent="1" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="HAProxy" vertex="1">
+          <mxGeometry height="50" width="140" x="510" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-3" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=light-dark(#000000, #6d5100);strokeWidth=2;" value="mongos" vertex="1">
+          <mxGeometry height="45" width="120" x="1730" y="907.5" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-4" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=light-dark(#000000, #6d5100);strokeWidth=2;" value="mongos" vertex="1">
+          <mxGeometry height="45" width="120" x="520" y="907.5" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-11" parent="1" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacing=16;" value="replicaSet-shard-01" vertex="1">
+          <mxGeometry height="220" width="570" x="920" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-12" parent="FeVo-T80gy2tgNIBbhQ5-11" value="shard-01-a (primary)" vertex="1">
+          <mxGeometry height="40" width="200" x="30" y="59.99705882352942" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-13" parent="FeVo-T80gy2tgNIBbhQ5-11" value="shard-01-b" vertex="1">
+          <mxGeometry height="40" width="200" x="30" y="150.00470588235294" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-14" parent="FeVo-T80gy2tgNIBbhQ5-11" value="shard-01-c" vertex="1">
+          <mxGeometry height="40" width="200" x="340" y="60.00176470588235" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-15" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-11" source="FeVo-T80gy2tgNIBbhQ5-12" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-14" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-310" y="427.05882352941177" as="sourcePoint" />
+            <mxPoint x="-260" y="362.3529411764706" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-16" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-11" source="FeVo-T80gy2tgNIBbhQ5-12" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-13" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-280" y="530.5882352941177" as="sourcePoint" />
+            <mxPoint x="-230" y="465.8823529411765" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-17" parent="1" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacing=16;" value="replicaSet-shard-02" vertex="1">
+          <mxGeometry height="220" width="570" x="920" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-18" parent="FeVo-T80gy2tgNIBbhQ5-17" value="shard-02-a (primary)" vertex="1">
+          <mxGeometry height="40" width="200" x="30" y="59.99705882352942" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-19" parent="FeVo-T80gy2tgNIBbhQ5-17" value="shard-02-b" vertex="1">
+          <mxGeometry height="40" width="200" x="30" y="140.00235294117647" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-20" parent="FeVo-T80gy2tgNIBbhQ5-17" value="shard-02-c" vertex="1">
+          <mxGeometry height="40" width="200" x="330" y="60.00176470588235" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-21" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-17" source="FeVo-T80gy2tgNIBbhQ5-18" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-19" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="250" y="465.8823529411765" as="sourcePoint" />
+            <mxPoint x="300" y="401.1764705882353" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-22" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-17" source="FeVo-T80gy2tgNIBbhQ5-18" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-20" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="300" y="362.3529411764706" as="sourcePoint" />
+            <mxPoint x="350" y="297.64705882352945" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-23" parent="1" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacing=16;" value="replicaSet-shard-03" vertex="1">
+          <mxGeometry height="220" width="570" x="920" y="1380" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-24" parent="FeVo-T80gy2tgNIBbhQ5-23" value="shard-03-a (primary)" vertex="1">
+          <mxGeometry height="40" width="200" x="30" y="59.99705882352942" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-25" parent="FeVo-T80gy2tgNIBbhQ5-23" value="shard-03-b" vertex="1">
+          <mxGeometry height="40" width="200" x="30" y="150.00235294117647" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-26" parent="FeVo-T80gy2tgNIBbhQ5-23" value="shard-03-c" vertex="1">
+          <mxGeometry height="40" width="200" x="340" y="60.00176470588235" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-27" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-23" source="FeVo-T80gy2tgNIBbhQ5-24" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-25" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="250" y="465.8823529411765" as="sourcePoint" />
+            <mxPoint x="300" y="401.1764705882353" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-28" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-23" source="FeVo-T80gy2tgNIBbhQ5-24" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-26" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="300" y="362.3529411764706" as="sourcePoint" />
+            <mxPoint x="350" y="297.64705882352945" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-29" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-1" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-2" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="710" y="1020" as="sourcePoint" />
+            <mxPoint x="760" y="970" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-30" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-2" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="770" y="1060" as="sourcePoint" />
+            <mxPoint x="820" y="1010" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-31" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-2" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-4" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="970" y="1020" as="sourcePoint" />
+            <mxPoint x="1020" y="970" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-32" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-5" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1230" y="670" as="sourcePoint" />
+            <mxPoint x="1280" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-33" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-11" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1260" y="1010" as="sourcePoint" />
+            <mxPoint x="1310" y="960" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-36" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-4" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-5" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1080" y="1140" as="sourcePoint" />
+            <mxPoint x="1480" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-37" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-11" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-4" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1180" y="1110" as="sourcePoint" />
+            <mxPoint x="1230" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1YgMQHHs7jZciWGftBQG-9" edge="1" parent="1" source="FeVo-T80gy2tgNIBbhQ5-4" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-5" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1043" y="405" as="sourcePoint" />
+            <mxPoint x="1587" y="930" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-5" parent="1" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;align=left;spacing=16;" value="replicaSet-config" vertex="1">
+          <mxGeometry height="220" width="570" x="920" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-6" parent="FeVo-T80gy2tgNIBbhQ5-5" style="rounded=1;" value="config-server-01" vertex="1">
+          <mxGeometry height="55.00000000000001" width="200" x="30" y="68.75" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-7" parent="FeVo-T80gy2tgNIBbhQ5-5" style="rounded=1;" value="config-server-02" vertex="1">
+          <mxGeometry height="55.00000000000001" width="200" x="30" y="154" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-8" parent="FeVo-T80gy2tgNIBbhQ5-5" style="rounded=1;" value="config-server-03" vertex="1">
+          <mxGeometry height="55.00000000000001" width="200" x="340" y="68.75" as="geometry" />
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-9" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-5" source="FeVo-T80gy2tgNIBbhQ5-6" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-7" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-20" y="-385.00000000000006" as="sourcePoint" />
+            <mxPoint x="30" y="-453.75000000000006" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FeVo-T80gy2tgNIBbhQ5-10" edge="1" parent="FeVo-T80gy2tgNIBbhQ5-5" source="FeVo-T80gy2tgNIBbhQ5-6" style="endArrow=classic;html=1;rounded=0;" target="FeVo-T80gy2tgNIBbhQ5-8" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-380" y="-96.25000000000001" as="sourcePoint" />
+            <mxPoint x="-330" y="-165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

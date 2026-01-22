@@ -23,8 +23,8 @@ Součástí práce je databázový návrh a technický popis řešení. **Není 
 
 ## 1.1 Schéma a popis architektury
 
-![Architecture](./architecture.svg)
-dd
+![Architecture](./doc/architecture.svg)
+
                 Vytvořte schéma architektury a vložte jako obrázek např. pomocí draw.io.
                 Podrobně architekturu popište, je nutné minimálně odpověď na tyto otázky:
                     Jak vypadá architektura Vašeho řešení a proč?
