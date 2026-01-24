@@ -25,14 +25,49 @@ Součástí práce je databázový návrh a technický popis řešení. **Není 
 
 ![Architecture](./doc/architecture.svg)
 
-                Vytvořte schéma architektury a vložte jako obrázek např. pomocí draw.io.
-                Podrobně architekturu popište, je nutné minimálně odpověď na tyto otázky:
-                    Jak vypadá architektura Vašeho řešení a proč?
-                    Jak se případně liší od doporučeného používání a proč?
-            1.2.Specifika konfigurace
-            Podrobně popište specifikaci Vaší konfigurace. Tato kapitola musí obsahovat následující podkapitoly:
+### Jak vypadá architektura Vašeho řešení a proč?
 
-## 1.2.1 CAP teorém
+Řešení je navrženo jako **MongoDB Sharded Cluster**, jehož cílem je zajistit **horizontální škálování**, **rovnoměrné rozložení zátěže a vysokou dostupnost dat**. V rámci této semestrální práce je architektura realizována se **třemi shardy**, které slouží jako **ukázková konfigurace**. V produkčním nasazení by byl počet shardů vyšší a přizpůsobený očekávanému objemu dat a zátěže.
+
+Cluster je tvořen několika shardy, přičemž každý **shard** je implementován jako **ReplicaSet**. Toto řešení umožňuje automatickou volbu primárního uzlu při výpadku a zvyšuje celkovou odolnost systému. Aplikační vrstva komunikuje výhradně přes **mongos router**, který zajišťuje transparentní směrování dotazů a zápisů na správné shardy. Metadata o shardech, chunkech a shard klíčích jsou uložena na **config servers**, které umožňují činnost MongoDB balanceru a správné vyvažování clusteru.
+
+Na architektonickém obrázku je naznačeno **rozložení clusteru do dvou datacenter**, které reflektuje typický produkční scénář. Toto rozdělení zvyšuje dostupnost řešení a jeho odolnost vůči výpadku celé lokality. V rámci semestrální práce slouží toto schéma především jako **koncepční ukázka produkčního nasazení**.
+
+Datový model je rozdělen do dvou hlavních kolekcí:
+
+- **viewers** – data vázaná na uživatele (pole **userId**)
+
+- **devices** – data vázaná na zařízení (pole **deviceId**)
+
+Sharding je povolen na databázi **video_watch_time** a obě kolekce jsou shardované pomocí **hashed shard key**, aby se dosáhlo rovnoměrné distribuce dat i zápisů napříč shardy:
+
+```javascript
+sh.enableSharding("video_watch_time")
+
+db.devices.createIndex({ deviceId: "hashed" })
+sh.shardCollection("video_watch_time.devices", { deviceId: "hashed" })
+
+db.viewers.createIndex({ userId: "hashed" })
+sh.shardCollection("video_watch_time.viewers", { userId: "hashed" })
+```
+
+Kolekce **viewers** je shardovaná podle pole **userId**, které je uloženo jako BinData (**subtype 04 – UUID**). Tento formát je úspornější než stringová reprezentace, umožňuje menší indexy a efektivnější shardování. UUID jsou převáděna do binární podoby již při exportu/importu dat, aby nedocházelo k dodatečným změnám shard key, které MongoDB nepovoluje.
+
+Kolekce **devices** je shardovaná podle pole **deviceId**, které je definováno jako pevně dlouhý string (16 znaků) a slouží jako přirozený identifikátor zařízení. Použití hashed shard key zajišťuje rovnoměrnou distribuci dat i v případě vysokého počtu aktivních zařízení.
+
+Inicializace clusteru i dat probíhá řízeně pomocí skriptů. Sharding a indexy jsou nastaveny **před samotným importem dat**, aby se data od počátku rovnoměrně rozprostřela mezi shardy a MongoDB balancer mohl efektivně udržovat vyvážený stav clusteru.
+
+### Jak se případně liší od doporučeného používání a proč?
+
+Namísto často doporučovaného **range shard key** je v řešení použit **hashed shard key** (pro **userId** i **deviceId**). Důvodem je skutečnost, že prioritou řešení je **rovnoměrná distribuce zápisů a stabilní výkon při vysoké zátěži**, nikoliv optimalizace range dotazů. Tento přístup zároveň minimalizuje riziko vzniku hotspotů a je vhodný pro write-heavy workload.
+
+Další odchylkou od běžného přístupu je **striktní dodržení neměnnosti shard key**. Veškeré transformace dat (např. převod UUID do **BinData**) probíhají ještě před importem do MongoDB, čímž se předchází nepovoleným hromadným aktualizacím shard key. Řízená inicializace shardovaných kolekcí před importem dat se liší od plně automatického chování MongoDB, ale zajišťuje předvídatelné chování clusteru a rovnoměrné zatížení shardů již od začátku provozu.
+
+MongoDB ve své dokumentaci standardně doporučuje **geograficky distribuovanou architekturu se třemi datacentry**, která umožňuje dosažení quorum i při výpadku celé jedné lokality (tzv. majority write concern). V rámci této semestrální práce a případného produkčního nasazení architektura počítá jen se **dvěmi datacentry**, což odpovídá demonstračnímu a produkčnímu charakteru řešení a omezenému rozsahu implementace a prostředků. Toto rozložení je na architektonickém obrázku uvedeno jako model možného produkčního nasazení, přičemž v ideálním produkčním prostředí by bylo vhodné rozšíření na tři a více datacenter v souladu s oficičními doporučeními MongoDB.
+
+## 1.2.Specifika konfigurace
+
+### 1.2.1 CAP teorém
 
 Navržené řešení splňuje garance Availability (A) a Partition Tolerance (P) Brewerova CAP teorému, tedy jedná se o AP systém.
 
@@ -86,6 +121,7 @@ Zvolená architektura tak představuje vědomý kompromis mezi:
                     Uveďte řádný popis.
 
 ### 1.2.4 Sharding/Partitioning
+
 V rámci této semestrální práce je databázový systém **MongoDB** provozován v **sharded clusteru** složeném z **minimálně tří shardů**. Každý shard je realizován jako **Replica Set**, což zajišťuje vysokou dostupnost dat a odolnost vůči výpadkům jednotlivých uzlů.
 
 Použití tří shardů je v kontextu semestrální práce považováno za **dostačující**, protože umožňuje demonstrovat princip horizontálního škálování, distribuci dat a směrování dotazů (query routing) v MongoDB. Zároveň odpovídá omezeným hardwarovým prostředkům dostupným pro akademické nasazení.
@@ -113,7 +149,7 @@ Výsledkem tohoto přístupu je:
 - a předvídatelné chování systému při vysoké zátěži.
 
 Zvolený způsob sharding/partitioningu je proto vhodný jak z hlediska výkonu, tak i z pohledu budoucího horizontálního škálování systému.
-            
+
 ### 1.2.5 Replikace
 
 Každý shard je implementován jako replica set se třemi replikami. Tento počet replik je považován za dostačující vzhledem k charakteru dat a poměru operací.
@@ -128,14 +164,15 @@ Systém je výrazně zápisově orientovaný, přičemž poměr operací je při
 
 Vyšší počet replik by znamenal vyšší latenci zápisů a zvýšené nároky na infrastrukturu, aniž by přinesl významný přínos pro daný use-case.
 
-
                 1.2.6. Perzistence dat
                     Minimálně 3.
                     Uveďte, jakým způsobem řeší Vaše databáze perzistenci dat?
                     Uveďte, jak pracujte s primární i sekundární pamětí.
                     Uveďte, jak načítáte a ukládáte data.
                     Uveďte řádný popis.
+
 ### 1.2.7
+
 Distribuce dat v navrženém řešení je realizována kombinací shardingové a replikační architektury. Data jsou nejprve směrována přes komponentu mongos, která na základě shard klíče rozhodne, do kterého shardu bude daný záznam uložen.
 
 Každý shard ukládá pouze část celkového datasetu a data jsou v rámci shardu replikována mezi tři uzly. Zápisová operace je primárně prováděna na primární repliku shardu, odkud jsou změny asynchronně propagovány na sekundární repliky.
@@ -149,7 +186,9 @@ Každý shard ukládá pouze část celkového datasetu a data jsou v rámci sha
                     Uveďte, jakým způsobem jste vyřešili zabezpečení databáze a proč?
                     Minimálně je požadována autentizace a autorizace.
                     Upozornění: V případě MongoDB je nutné mít keyfile.
+
 # FUNKČNÍ ŘEŠENÍ
+
             Tato kapitola obsahuje popis návod na zprovoznění funkčního řešení a popis jeho struktury. 
             2.1. Struktura
                 Popište adresářovou strukturu Vašeho řešení a jednotlivé soubory, docker-compose.yml popište důkladně samostatně v kapitole 2.1.1.
@@ -159,18 +198,26 @@ Každý shard ukládá pouze část celkového datasetu a data jsou v rámci sha
                 Podrobně popište, jak zprovoznit Vaše řešení.
                 Řešení je nutné vytvořit tak, aby využívalo docker a spuštění probíhalo maximálně automatizovaně pomocí docker-compose.yml, tzn. že docker-compose.yml odkazuje na veškeré skripty, se kterými pracuje a pro zprovoznění není nutné provádět manuální spuštění pomocných skriptů.
                 V rámci docker-compose.yml využijte automatické spuštění skriptů poté co se vám spustí kontejnery viz například https://www.baeldung.com/ops/docker-compose-run-script-on-start
+
 # PŘÍPADY UŽITÍ A PŘÍPADOVÉ STUDIE
+
             Popište pro jaké účely (případy užití) ja daná NoSQL databáze vhodná. 
             Uveďte, pro jaký účel (případ užití) jste si danou databázi zvolili a proč? K čemu Vaše řešení slouží? O jaký případ užití se jedná?
             Uveďte, proč jste nezvolili jinou NoSQL databázi vzhledem k účelu?
             Vyhledejte a popište 3 případové studie spojené s vybranou NoSQL databázi.
             Rozsah každé případové studie musí být alespoň 1/2 A4.
+
 # VÝHODY A NEVÝHODY
+
             Popište, jaké výhody a nevýhody má daná NoSQL databáze.
             Uveďte, jaké výhody a nevýhody má Vaše řešení a proč?
+
 # DALŠÍ SPECIFIKA
+
             Popis specifických vlastností řešení, pokud nejsou použity žádná specifika, pak uveďte, že vaše řešení je použito jak je doporučeno a nemá vlastní specifika (nic mu nechybí a ani mu nic nepřebývá).
+
 # DATA
+
             Použijte libovolné 3 datové soubory, kdy jeden soubor obsahuje alespoň 5 tis. záznamů.
             Popis dat bude ve velké míře zpracován pomocí knihoven jazyka Python a dále bude doplněn dovysvětlujícími texty.
             S jakými typy dat Vaše databáze pracuje, jakého jsou formátu a jak s nimi databáze nakládá?
@@ -180,7 +227,9 @@ Každý shard ukládá pouze část celkového datasetu a data jsou v rámci sha
             Jaké úpravy jste s daty prováděli a proč?
             Jaký je zdroj dat? Uveďte URL adresu.
             Pomocí skriptů v Python s využitím knihoven Pandas, Numpy, apod. data popište a proveďte základní analýzu dat (základní statistiky - počty, prázdná pole, suma, průměr, grafické zobrazení, apod.
+
 # DOTAZY
+
             Uveďte a popište 30 NETRIVIÁLNÍCH různých navazujících příkladů včetně řešení (všechny tři datasety popisují jedno téma) a podrobného vysvětlení jednotlivých příkazů.
                 NETRIVIVÁLNÍ DOTAZ je například dotaz využívající v MongoDB aggregate a zároveň unwind a zároveň group a zároveň sort nebo například aggregate a zároveň lookup a zároveň match a zároveň project nebo aggregate a zároveň unset a zároveň ......
                 Příkazy řádně okomentujete tzn., že každý příkaz zkopírujete z konzole a u každého příkazu uvedete, jaké je jeho obecné chování a jak konkrétně pracuje s daty ve vašem případě a řeší konkrétní úlohu.
@@ -196,11 +245,17 @@ Každý shard ukládá pouze část celkového datasetu a data jsou v rámci sha
             Dle zvoleného typu databáze využijte i možnost práce s clusterem, replikačním faktorem a shardingem.
             Pokuste se například (mimo jiné) nasimulovat výpadek některého z uzlů a popište možnosti řešení.
             Upozornění: V případě MongoDB je nutné mít validační schéma.
+
 # ZÁVĚR
+
             V závěru pochvalně i kriticky zhodnoťte Vaši semestrální práci, popište hloubku zpracování. Shrňte k jakým závěrům jste došli, co je možné s Vaším řešením vykonávat, apod.
+
 # ZDROJE
+
             Uveďte řádně všechny zdroje, se kterými jste pracovali, abecedně seřazené, a to včetně použitých nástrojů.
+
 # PŘÍLOHY DOKUMENTACE
+
             Data
             složka pojmenovaná Data, která obsahuje:
                 obsahuje minimálně 3 datasety
