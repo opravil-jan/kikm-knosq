@@ -66,6 +66,9 @@ mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initd
 log "DB" "Creating users"
 mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/05-db-users.js
 
+log "DB" "Enabling sharding"
+mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/08-db-enable-sharding.js
+
 log "IMPORT" "Importing data into the cluster"
 mongoimport \
   --host mongos-01.femoz.net \
@@ -86,10 +89,5 @@ mongoimport \
   --jsonArray \
   --stopOnError \
   --verbose
-
-log "DB" "Reconfiguring collection viewers"
-mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/07-reconfigure-schema-viewer.js
-log "DB" "Enabling sharding"
-mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/08-db-enable-sharding.js
 
 log "DONE" "Cluster initialization completed successfully."

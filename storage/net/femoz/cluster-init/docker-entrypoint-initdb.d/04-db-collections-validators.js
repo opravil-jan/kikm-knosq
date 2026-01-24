@@ -46,13 +46,8 @@ db.createCollection("viewers", {
     $jsonSchema: {
       bsonType: "object",
       title: "Viewers viewing time",
-      required: ["userId_temporary", "idec", "progress"],
+      required: ["userId", "idec", "progress"],
       properties: {
-        userId_temporary: {
-          bsonType: "string",
-          description:
-            "'userId_temporary' must be a binary data and is required",
-        },
         userId: {
           bsonType: "binData",
           description: "'userId' must be a binary data and is required",
