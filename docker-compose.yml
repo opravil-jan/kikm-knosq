@@ -265,7 +265,7 @@ services:
     image: mongo
     container_name: cluster-init
     env_file:
-      - .evn
+      - .env
     entrypoint: ["bash", "/scripts/init-cluster.sh"]
     volumes:
       - ./storage/net/femoz/cluster-init/scripts:/scripts:ro
