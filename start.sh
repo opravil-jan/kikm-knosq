@@ -19,18 +19,26 @@ DIRECTORIES=(
   "storage/net/femoz/shard-03-c/data/db"
 )
 
+# load environment variables from .env file
+export $(grep -v '^#' .env | xargs)
+
 docker compose down
 
-for DIRECTORY in "${DIRECTORIES[@]}"; do
-  if [ -d "$DIRECTORY" ]; then
-    echo "Mažu adresář: $DIRECTORY"
-    sudo rm -rf "$DIRECTORY"
-  else
-    echo "Adresář neexistuje, přeskakuji: $DIRECTORY"
-  fi
-  echo "Zakládám adresář: $DIRECTORY"
-  mkdir -p "$DIRECTORY"
-done
+if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
 
+  for DIRECTORY in "${DIRECTORIES[@]}"; do
+    if [ -d "$DIRECTORY" ]; then
+      echo "Deleting directory: $DIRECTORY"
+      sudo rm -rf "$DIRECTORY"
+    else
+      echo "Directory does not exist, skipping: $DIRECTORY"
+    fi
+    echo "Creating directory: $DIRECTORY"
+    mkdir -p "$DIRECTORY"
+  done
+else 
+  echo "SKIP - Cluster already initialized. Exiting."
+fi
+  
 docker compose up -d
 #docker container prune

@@ -3,4 +3,3 @@ storage/net/femoz/*
 !storage/net/femoz/haproxy
 rest-client
 work-in-progress
-.env

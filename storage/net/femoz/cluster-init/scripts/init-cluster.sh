@@ -18,6 +18,11 @@ wait_for_mongo() {
     done
 }
 
+if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 0 ]; then
+  log "SKIP" "Cluster already initialized. Exiting."
+  exit 0
+fi
+
 log "BOOT" "Waiting for config servers..."
 wait_for_mongo "config-server-01.femoz.net" 27019
 wait_for_mongo "config-server-02.femoz.net" 27019
