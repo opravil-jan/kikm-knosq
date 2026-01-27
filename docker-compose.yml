@@ -286,16 +286,6 @@ services:
       - mongos-01.femoz.net
       - mongos-02.femoz.net
     
-
-# mongodb:
-#   image: mongo
-#   container_name: net.femoz.mongodb
-#   env_file: ".env"
-#   restart: unless-stopped
-#   volumes:
-#     - ./storage/net/femoz/mongodb/data/db:/data/db:Z
-#     - ./storage/net/femoz/mongodb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:Z  
-
 networks: 
   default: 
     name: container-network
