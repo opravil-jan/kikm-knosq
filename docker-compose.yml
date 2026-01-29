@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./storage/net/femoz/config-server-01/data/configdb:/data/configdb:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod
       - --configsvr
@@ -15,6 +16,9 @@ services:
       - --bind_ip_all
       - --port
       - "27019"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   config-server-02.femoz.net:
     image: mongo
@@ -23,6 +27,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./storage/net/femoz/config-server-02/data/configdb:/data/configdb:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod
       - --configsvr
@@ -31,6 +36,9 @@ services:
       - --bind_ip_all
       - --port
       - "27019"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   config-server-03.femoz.net:
     image: mongo
@@ -39,6 +47,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./storage/net/femoz/config-server-03/data/configdb:/data/configdb:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod
       - --configsvr
@@ -47,6 +56,9 @@ services:
       - --bind_ip_all
       - --port
       - "27019"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   # -------- SHARD 01 (replSet shard-01) --------
   shard-01-a.femoz.net:
@@ -55,7 +67,8 @@ services:
     hostname: shard-01-a.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-01-a/data/db:/data/db    
+      - ./storage/net/femoz/shard-01-a/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -64,6 +77,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   shard-01-b.femoz.net:
     image: mongo
@@ -71,7 +87,8 @@ services:
     hostname: shard-01-b.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-01-b/data/db:/data/db
+      - ./storage/net/femoz/shard-01-b/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -80,6 +97,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   shard-01-c.femoz.net:
     image: mongo
@@ -87,7 +107,8 @@ services:
     hostname: shard-01-c.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-01-c/data/db:/data/db
+      - ./storage/net/femoz/shard-01-c/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -96,16 +117,19 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   # -------- SHARD 02 (replSet shard2RS) --------
-
   shard-02-a.femoz.net:
     image: mongo
     container_name: shard-02-a
     hostname: shard-02-a.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-02-a/data/db:/data/db    
+      - ./storage/net/femoz/shard-02-a/data/db:/data/db:Z  
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -114,6 +138,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   shard-02-b.femoz.net:
     image: mongo
@@ -121,7 +148,8 @@ services:
     hostname: shard-02-b.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-02-b/data/db:/data/db
+      - ./storage/net/femoz/shard-02-b/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -130,6 +158,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   shard-02-c.femoz.net:
     image: mongo
@@ -137,7 +168,8 @@ services:
     hostname: shard-02-c.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-02-c/data/db:/data/db
+      - ./storage/net/femoz/shard-02-c/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -146,6 +178,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   # -------- SHARD 03 (replSet shard-03) --------
   shard-03-a.femoz.net:
@@ -154,7 +189,8 @@ services:
     hostname: shard-03-a.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-03-a/data/db:/data/db    
+      - ./storage/net/femoz/shard-03-a/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -163,6 +199,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   shard-03-b.femoz.net:
     image: mongo
@@ -170,7 +209,8 @@ services:
     hostname: shard-03-b.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-03-b/data/db:/data/db
+      - ./storage/net/femoz/shard-03-b/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -179,6 +219,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   shard-03-c.femoz.net:
     image: mongo
@@ -186,7 +229,8 @@ services:
     hostname: shard-03-c.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/shard-03-c/data/db:/data/db
+      - ./storage/net/femoz/shard-03-c/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongod 
       - --shardsvr
@@ -195,6 +239,9 @@ services:
       - --bind_ip_all
       - --port
       - "27018"
+      - --auth
+      - --keyFile 
+      - /etc/mongo/keyfile
 
   # -------- MONGOS ROUTER --------
   mongos-01.femoz.net:
@@ -203,7 +250,8 @@ services:
     hostname: mongos-01.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/mongos-01/data/db:/data/db
+      - ./storage/net/femoz/mongos-01/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongos
       - --configdb 
@@ -211,6 +259,8 @@ services:
       - --bind_ip_all
       - --port
       - "27017"
+      - --keyFile 
+      - /etc/mongo/keyfile
     depends_on:
       - config-server-01.femoz.net
       - config-server-02.femoz.net
@@ -222,7 +272,8 @@ services:
     hostname: mongos-02.femoz.net
     restart: unless-stopped
     volumes:
-      - ./storage/net/femoz/mongos-01/data/db:/data/db
+      - ./storage/net/femoz/mongos-02/data/db:/data/db:Z
+      - ./storage/net/femoz/mongo-keyfile:/etc/mongo/keyfile:ro,Z
     command:
       - mongos
       - --configdb 
@@ -230,6 +281,8 @@ services:
       - --bind_ip_all
       - --port
       - "27017"
+      - --keyFile 
+      - /etc/mongo/keyfile
     depends_on:
       - config-server-01.femoz.net
       - config-server-02.femoz.net
@@ -258,34 +311,7 @@ services:
       - shard-03-c.femoz.net
       - mongos-01.femoz.net
       - mongos-02.femoz.net
-    
-    
 
-  cluster-init:
-    image: mongo
-    container_name: cluster-init
-    env_file:
-      - .env
-    entrypoint: ["bash", "/scripts/init-cluster.sh"]
-    volumes:
-      - ./storage/net/femoz/cluster-init/scripts:/scripts:ro
-      - ./storage/net/femoz/cluster-init/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-    depends_on:
-      - config-server-01.femoz.net
-      - config-server-02.femoz.net
-      - config-server-03.femoz.net
-      - shard-01-a.femoz.net
-      - shard-01-b.femoz.net
-      - shard-01-c.femoz.net
-      - shard-02-a.femoz.net
-      - shard-02-b.femoz.net
-      - shard-02-c.femoz.net
-      - shard-03-a.femoz.net
-      - shard-03-b.femoz.net
-      - shard-03-c.femoz.net
-      - mongos-01.femoz.net
-      - mongos-02.femoz.net
-    
 networks: 
   default: 
     name: container-network
