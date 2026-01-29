@@ -694,12 +694,12 @@ db = db.getSiblingDB("video_watch_time");
 db.devices.aggregate([
   {
     $match: {
-      deviceId: DEVICE_ID
+      deviceId: "7900991453332736"
     }
   },
   {
     $addFields: {
-      userId: USER_ID,
+      userId: UUID("808fc319-c8af-460b-a27d-0ec2b6f145fd"),
       createdAt: new Date(),
       updatedAt: new Date()
     }
