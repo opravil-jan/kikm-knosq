@@ -121,7 +121,7 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
     -v "$(pwd)/funkcni-reseni:/scripts:ro" \
     mongo \
     mongosh \
-      --host mongos-01.femoz.net \
+      --host mongodb.femoz.net \
       --port 27017 \
       --username "${CLUSTER_ADMIN_USERNAME}" \
       --password "${CLUSTER_ADMIN_PASSWORD}" \
@@ -134,7 +134,7 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
     -v "$(pwd)/funkcni-reseni:/scripts:ro" \
     mongo \
     mongosh \
-      --host mongos-01.femoz.net \
+      --host mongodb.femoz.net \
       --port 27017 \
       --username "${CLUSTER_ADMIN_USERNAME}" \
       --password "${CLUSTER_ADMIN_PASSWORD}" \
@@ -174,7 +174,7 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
     -v "$(pwd)/data:/import-data:ro" \
     mongo \
     mongoimport \
-      --host mongos-01.femoz.net \
+      --host mongodb.femoz.net \
       --port 27017 \
       --username "${VIDEO_WATCH_TIME_USERNAME}" \
       --password "${VIDEO_WATCH_TIME_PASSWORD}" \
@@ -191,7 +191,7 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
     -v "$(pwd)/data:/import-data:ro" \
     mongo \
     mongoimport \
-      --host mongos-01.femoz.net \
+      --host mongodb.femoz.net \
       --port 27017 \
       --username "${VIDEO_WATCH_TIME_USERNAME}" \
       --password "${VIDEO_WATCH_TIME_PASSWORD}" \
