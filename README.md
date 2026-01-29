@@ -164,12 +164,17 @@ Systém je výrazně zápisově orientovaný, přičemž poměr operací je při
 
 Vyšší počet replik by znamenal vyšší latenci zápisů a zvýšené nároky na infrastrukturu, aniž by přinesl významný přínos pro daný use-case.
 
-                1.2.6. Perzistence dat
-                    Minimálně 3.
-                    Uveďte, jakým způsobem řeší Vaše databáze perzistenci dat?
-                    Uveďte, jak pracujte s primární i sekundární pamětí.
-                    Uveďte, jak načítáte a ukládáte data.
-                    Uveďte řádný popis.
+#### 1.2.6 Perzistence dat
+
+Perzistence dat v semestrální práci je řešena pomocí databázového systému **MongoDB**, který slouží jako hlavní úložiště dat získaných z externího zdroje a následně analyzovaných. Databáze uchovává data o zařízeních a divácích v kolekcích devices a viewers, nad kterými jsou prováděny analytické dotazy. Data jsou ukládána trvale na disk a zůstávají zachována i po restartu databázového systému nebo celé aplikace.
+
+Databáze je provozována v kontejnerizovaném prostředí pomocí Dockeru. Datový adresář MongoDB je mapován na perzistentní úložiště hostitelského systému, čímž je zajištěno, že uložená data nejsou závislá na životním cyklu kontejneru. Tento přístup umožňuje opakované spouštění databáze bez ztráty již importovaných nebo zpracovaných dat.
+
+MongoDB pracuje s kombinací **primární paměti (RAM)** a **sekundární paměti (disk)**. Operační paměť je využívána především pro cachování často používaných dat a indexů, které jsou následně využívány při agregačních dotazech. Disk slouží jako dlouhodobé úložiště kompletní datové sady. Přesun dat mezi pamětí a diskem je řízen databázovým systémem automaticky a nevyžaduje zásah aplikační vrstvy.
+
+Ukládání dat do databáze probíhá zejména formou **hromadného importu dat ze souborů JSON** při inicializaci databáze. Tato data představují vstupní dataset pro další zpracování. V průběhu práce s databází jsou využívány operace update a upsert, které umožňují aktualizaci existujících záznamů a zabraňují vzniku duplicit, například při opakovaném zpracování stejných dat.
+
+Načítání dat je realizováno pomocí dotazů find a především pomocí agregačních pipeline, které jsou klíčovou součástí semestrální práce. Agregace jsou používány pro výpočty statistik, jako jsou počty zařízení, počty záznamů sledování nebo identifikace zařízení, na kterých nebylo zaznamenáno sledování videa. Zpracování probíhá přímo v databázi, což snižuje množství přenášených dat a zvyšuje efektivitu celého řešení.
 
 #### 1.2.7
 
@@ -179,9 +184,129 @@ Každý shard ukládá pouze část celkového datasetu a data jsou v rámci sha
 
 Čtecí operace mohou být směrovány buď na primární, nebo sekundární uzly, v závislosti na požadované konzistenci. Celková distribuce dat je tak navržena tak, aby maximalizovala dostupnost, zvládala vysoký počet zápisů a umožňovala horizontální škálování systému.
 
-                1.2.7. Distribuce dat
-                    Z předešlých kapitol vše shrňte a uveďte, jak se data rozdělují pomocí shardů, jak je replikujte, jak konkrétně u Vašeho řešení probíhá celková distribuce dat pro zápis/čtení.
-                    Uveďte řádný popis - textový popis + screeny + popis uvádějící například skript, který provádí automatické rozdělení dat, počty záznamů na jendotlivých uzlech (count),...
+##### collection Devices
+
+###### Dotaz pro zjištění rozložení dat mezi jednotlivými shardy
+
+```javascript
+db.devices.getShardDistribution()
+```
+
+###### Výsledek dotazu
+
+```javascript
+
+Shard replicaSet-shard-02 at replicaSet-shard-02/shard-02-a.femoz.net:27018,shard-02-b.femoz.net:27018,shard-02-c.femoz.net:27018
+{
+  data: '43.94MiB',
+  docs: 334497,
+  chunks: 1,
+  'estimated data per chunk': '43.94MiB',
+  'estimated docs per chunk': 334497
+}
+
+Shard replicaSet-shard-03 at replicaSet-shard-03/shard-03-a.femoz.net:27018,shard-03-b.femoz.net:27018,shard-03-c.femoz.net:27018
+{
+  data: '43.72MiB',
+  docs: 332820,
+  chunks: 1,
+  'estimated data per chunk': '43.72MiB',
+  'estimated docs per chunk': 332820
+}
+
+Shard replicaSet-shard-01 at replicaSet-shard-01/shard-01-a.femoz.net:27018,shard-01-b.femoz.net:27018,shard-01-c.femoz.net:27018
+{
+  data: '43.7MiB',
+  docs: 332683,
+  chunks: 1,
+  'estimated data per chunk': '43.7MiB',
+  'estimated docs per chunk': 332683
+}
+
+Totals
+{
+  data: '131.37MiB',
+  docs: 1000000,
+  chunks: 3,
+  'Shard replicaSet-shard-02': [
+    '33.45 % data',
+    '33.44 % docs in cluster',
+    '137B avg obj size on shard'
+  ],
+  'Shard replicaSet-shard-03': [
+    '33.28 % data',
+    '33.28 % docs in cluster',
+    '137B avg obj size on shard'
+  ],
+  'Shard replicaSet-shard-01': [
+    '33.26 % data',
+    '33.26 % docs in cluster',
+    '137B avg obj size on shard'
+  ]
+}
+```
+
+##### collection viewers
+
+###### Dotaz pro zjištění rozložení dat mezi jednotlivými shardy
+
+```javascript
+db.viewers.getShardDistribution()
+```
+
+###### Výsledek dotazu
+
+```javascript
+
+Shard replicaSet-shard-03 at replicaSet-shard-03/shard-03-a.femoz.net:27018,shard-03-b.femoz.net:27018,shard-03-c.femoz.net:27018
+{
+  data: '56.65MiB',
+  docs: 330943,
+  chunks: 1,
+  'estimated data per chunk': '56.65MiB',
+  'estimated docs per chunk': 330943
+}
+Shard replicaSet-shard-02 at replicaSet-shard-02/shard-02-a.femoz.net:27018,shard-02-b.femoz.net:27018,shard-02-c.femoz.net:27018
+{
+  data: '57.17MiB',
+  docs: 334128,
+  chunks: 1,
+  'estimated data per chunk': '57.17MiB',
+  'estimated docs per chunk': 334128
+}
+
+Shard replicaSet-shard-01 at replicaSet-shard-01/shard-01-a.femoz.net:27018,shard-01-b.femoz.net:27018,shard-01-c.femoz.net:27018
+{
+  data: '57.32MiB',
+  docs: 334929,
+  chunks: 1,
+  'estimated data per chunk': '57.32MiB',
+  'estimated docs per chunk': 334929
+}
+
+Totals
+{
+  data: '171.15MiB',
+  docs: 1000000,
+  chunks: 3,
+  'Shard replicaSet-shard-03': [
+    '33.1 % data',
+    '33.09 % docs in cluster',
+    '179B avg obj size on shard'
+  ],
+  'Shard replicaSet-shard-02': [
+    '33.4 % data',
+    '33.41 % docs in cluster',
+    '179B avg obj size on shard'
+  ],
+  'Shard replicaSet-shard-01': [
+    '33.49 % data',
+    '33.49 % docs in cluster',
+    '179B avg obj size on shard'
+  ]
+}
+```
+
                 1.2.8. Zapezpečení
                     Uveďte, jakým způsobem jste vyřešili zabezpečení databáze a proč?
                     Minimálně je požadována autentizace a autorizace.
@@ -564,6 +689,7 @@ db.viewers.deleteMany({ userId: UUID("8ba16964-bda3-4a4e-9ae4-07e4c25ecf04") })
 #### Merge: převeď všechny rozkoukané videa anonymního diváka pod účet diváka přihlášeného diváka
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
 
 db.devices.aggregate([
   {
@@ -595,6 +721,7 @@ db.devices.aggregate([
 #### Seznam deseti nejsledovanejsich videi anonymních diváků
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
 
 db.devices.aggregate([
   {
@@ -630,6 +757,7 @@ db.devices.aggregate([
 #### Počet zařízení na kterých se diváci nepřihlašují
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
 
 db.devices.aggregate([
   {
@@ -692,14 +820,14 @@ db.devices.aggregate([
 
 ```
 
-### 
-
+### xxx
 
 ### 7.3 Konfigurace
 
 #### Rozložení collection v shardech
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
 
 db.devices.getShardDistribution()
 
@@ -707,10 +835,19 @@ db.devices.getShardDistribution()
 
 ### 7.5 Indexy
 
+#### Unique index pro zamezení duplicit rozkoukanosti
+
 ```javascript
 db = db.getSiblingDB("video_watch_time");
 
 db.devices.createIndex({ deviceId: 1, idec: 1 }, { unique: true });
+```
+
+#### Index pro zrychlení lookup mezi tabulkami
+
+```javascript
+db = db.getSiblingDB("video_watch_time")
+db.devices.createIndex({ deviceId: 1 })
 ```
 
 
