@@ -43,7 +43,7 @@ log() {
 export $(grep -v '^#' .env | xargs)
 
 
-docker compose down
+docker compose down --remove-orphans
 
 
 if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
@@ -171,7 +171,7 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
 
   docker run --rm \
     --network container-network \
-    -v "$(pwd)/data:/data:ro" \
+    -v "$(pwd)/data:/import-data:ro" \
     mongo \
     mongoimport \
       --host mongos-01.femoz.net \
@@ -181,14 +181,14 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
       --authenticationDatabase "${VIDEO_WATCH_TIME_AUTHENTICATION_DATABASE}" \
       --db video_watch_time \
       --collection devices \
-      --file /data/devices.json \
+      --file /import-data/devices.json \
       --jsonArray \
       --stopOnError \
       --verbose
 
   docker run --rm \
     --network container-network \
-    -v "$(pwd)/data:/data:ro" \
+    -v "$(pwd)/data:/import-data:ro" \
     mongo \
     mongoimport \
       --host mongos-01.femoz.net \
@@ -198,12 +198,12 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
       --authenticationDatabase "${VIDEO_WATCH_TIME_AUTHENTICATION_DATABASE}" \
       --db video_watch_time \
       --collection viewers \
-      --file /data/viewers.json \
+      --file /import-data/viewers.json \
       --jsonArray \
       --stopOnError \
       --verbose
 
-#  sed -i 's/^CLUSTER_INIT_ENABLED=.*/CLUSTER_INIT_ENABLED=0/' .env
+  sed -i 's/^CLUSTER_INIT_ENABLED=.*/CLUSTER_INIT_ENABLED=0/' .env
 
   log "DONE" "Cluster initialization completed successfully."
 
