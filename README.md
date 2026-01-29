@@ -496,15 +496,15 @@ Skript provádí následující kroky:
 2. Zastaví běžící kontejnery (docker compose down)
 
 3. Pokud je povolena inicializace (CLUSTER_INIT_ENABLED=1):
-
+    - vytvoří docker network pokud neexistuje
     - smaže stará data shardů a config serverů
     - vytvoří čisté adresáře pro nový cluster
 
 4. Spustí celý cluster pomocí:
 
-```code
-docker compose up -d
-```
+    ```code
+    docker compose up -d
+    ```
 
 Díky tomuto přístupu je možné:
 
