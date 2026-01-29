@@ -867,7 +867,7 @@ db.devices.aggregate([
       whenNotMatched: "insert"
     }
   }
-])
+]).toArray()
 ```
 
 ### 7.2 Agregační funkce
@@ -970,7 +970,7 @@ db.devices.aggregate([
   {
     $count: "uniqueDevicesInBoth"
   }
-])
+]).toArray()
 ```
 
 #### Seznam 20 nejrozkoukanejsich serialu na ktere se divaji prihlaseni divaci
@@ -1003,9 +1003,92 @@ db.viewers.aggregate([
       idecCount: 1
     }
   }
-])
+]).toArray()
 
 ```
+
+#### Seznam uživatelů kteří nekoukali na žadné video za poslední rok
+
+```javascript
+const oneYearAgo = new Date();
+oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+db.viewers.aggregate([
+  {
+    $group: {
+      _id: "$userId",
+      lastUpdatedAt: { $max: "$updatedAt" }
+    }
+  },
+  {
+    $match: {
+      $or: [
+        { lastUpdatedAt: { $lt: oneYearAgo } },
+        { lastUpdatedAt: { $exists: false } }
+      ]
+    }
+  }
+]).toArray();
+```
+
+#### Celkový počet videi které sledovaly anonymní diváci a nedokoukali je. To jest updatedAt je starší než jeden měsíc
+
+```javascript
+const oneMonthAgo = new Date();
+oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+db.devices.aggregate([
+  {
+    $match: {
+      finished: false,
+      updatedAt: { $lt: oneMonthAgo }
+    }
+  },
+  {
+    $count: "totalUndoneVideos"
+  }
+]).toArray();
+```
+
+#### Kolik průměrně má přihlášený divák rozkoukaných videii za posledni 3 měsíce
+
+```javascript
+const threeMonthsAgo = new Date();
+threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+db.viewers.aggregate([
+  // jen poslední 3 měsíce + rozkoukaná videa
+  {
+    $match: {
+      finished: false,
+      updatedAt: { $gte: threeMonthsAgo }
+    }
+  },
+
+  // počet rozkoukaných videí per user
+  {
+    $group: {
+      _id: "$userId",
+      rozkoukanaVidea: { $sum: 1 }
+    }
+  },
+
+  // průměr přes všechny uživatele
+  {
+    $group: {
+      _id: null,
+      prumerRozkoukanychVideiNaUzivatele: {
+        $avg: "$rozkoukanaVidea"
+      },
+      pocetUzivatelu: { $sum: 1 }
+    }
+  }
+]).toArray();
+
+```
+
+
+
 
 ### xxx
 
@@ -1024,25 +1107,15 @@ db.devices.getShardDistribution()
 
 #### Unique index pro zamezení duplicit rozkoukanosti
 
+Index je použit už při inicializaci clusteru před tím než jsou do něj importována první data
+
 ```javascript
 db = db.getSiblingDB("video_watch_time");
 
 db.devices.createIndex({ deviceId: 1, idec: 1 }, { unique: true });
 ```
 
-#### Index pro zrychlení lookup mezi tabulkami
 
-```javascript
-db = db.getSiblingDB("video_watch_time")
-db.devices.createIndex({ deviceId: 1 })
-db.viewers.createIndex({ deviceId: 1 })
-```
-
-#### Index pro zrychlení dotazu na rozkoukane seriály
-
-```javascript
-db.viewers.createIndex({ finished: 1, sidp: 1, idec: 1 })
-```
 
 ## 8. ZÁVĚR
 
