@@ -23,57 +23,30 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 0 ]; then
   exit 0
 fi
 
-log "BOOT" "Waiting for config servers..."
-wait_for_mongo "config-server-01.femoz.net" 27019
-wait_for_mongo "config-server-02.femoz.net" 27019
-wait_for_mongo "config-server-03.femoz.net" 27019
-
-log "CONFIG" "Initializing config replica set"
-mongosh --host config-server-01.femoz.net --port 27019 --quiet /docker-entrypoint-initdb.d/01-config-rs-init.js
-
-log "BOOT" "Waiting for shard-01 nodes..."
-wait_for_mongo "shard-01-a.femoz.net" 27018
-wait_for_mongo "shard-01-b.femoz.net" 27018
-wait_for_mongo "shard-01-c.femoz.net" 27018
-
-log "SHARD-01" "Initializing shard-01 replica set"
-mongosh --host shard-01-a.femoz.net --port 27018 --quiet /docker-entrypoint-initdb.d/02-shard-01-rs-init.js
-
-log "BOOT" "Waiting for shard-02 nodes..."
-wait_for_mongo "shard-02-a.femoz.net" 27018
-wait_for_mongo "shard-02-b.femoz.net" 27018
-wait_for_mongo "shard-02-c.femoz.net" 27018
-
-log "SHARD-02" "Initializing shard-02 replica set"
-mongosh --host shard-02-a.femoz.net --port 27018 --quiet /docker-entrypoint-initdb.d/02-shard-02-rs-init.js
-
-log "BOOT" "Waiting for shard-03 nodes..."
-wait_for_mongo "shard-03-a.femoz.net" 27018
-wait_for_mongo "shard-03-b.femoz.net" 27018
-wait_for_mongo "shard-03-c.femoz.net" 27018
-
-log "SHARD-03" "Initializing shard-03 replica set"
-mongosh --host shard-03-a.femoz.net --port 27018 --quiet /docker-entrypoint-initdb.d/02-shard-03-rs-init.js
-
 log "BOOT" "Waiting for mongos routers..."
 wait_for_mongo "mongos-01.femoz.net" 27017
 wait_for_mongo "mongos-02.femoz.net" 27017
 
-log "MONGOS" "Adding shards to cluster"
-mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/03-mongos-add-shards.js
-log "DB" "Creating collections + validators"
-mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/04-db-collections-validators.js
 log "DB" "Creating users"
-mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/05-db-users.js
+mongosh --host mongodb.femoz.net --port 27017 -u cluster-admin -p gaetaiNgaisou6eilahmoS6chahr3ohf --authenticationDatabase admin --quiet /docker-entrypoint-initdb.d/05-db-users.js
+
+log "MONGOS" "Adding shards to cluster"
+mongosh --host mongodb.femoz.net --port 27017 -u ${INIT_CLUSTER_ADMIN_USERNAME} -p ${INIT_CLUSTER_ADMIN_PASSWORD} --authenticationDatabase ${INIT_CLUSTER_ADMIN_AUTHENTICATION_DATABASE} --quiet /docker-entrypoint-initdb.d/03-mongos-add-shards.js
+
+log "DB" "Creating collections + validators"
+mongosh --host mongodb.femoz.net --port 27017 -u ${INIT_CLUSTER_ADMIN_USERNAME} -p ${INIT_CLUSTER_ADMIN_PASSWORD} --authenticationDatabase ${INIT_CLUSTER_ADMIN_AUTHENTICATION_DATABASE} --quiet /docker-entrypoint-initdb.d/04-db-collections-validators.js
 
 log "DB" "Enabling sharding"
-mongosh --host mongos-01.femoz.net --port 27017 --quiet /docker-entrypoint-initdb.d/08-db-enable-sharding.js
+mongosh --host mongodb.femoz.net --port 27017 -u ${INIT_CLUSTER_ADMIN_USERNAME} -p ${INIT_CLUSTER_ADMIN_PASSWORD} --authenticationDatabase ${INIT_CLUSTER_ADMIN_AUTHENTICATION_DATABASE} --quiet /docker-entrypoint-initdb.d/06-db-enable-sharding.js
 
 log "IMPORT" "Importing data into the cluster"
 mongoimport \
-  --host mongos-01.femoz.net \
+  --host mongodb.femoz.net \
   --port 27017 \
   --db video_watch_time \
+  --username ${VIDEO_WATCH_TIME_USERNAME} \
+  --password ${VIDEO_WATCH_TIME_PASSWORD} \
+  --authenticationDatabase ${VIDEO_WATCH_TIME_AUTHENTICATION_DATABASE} \
   --collection devices \
   --file /docker-entrypoint-initdb.d/data/devices.json \
   --jsonArray \
@@ -81,9 +54,12 @@ mongoimport \
   --verbose
 
 mongoimport \
-  --host mongos-01.femoz.net \
+  --host mongodb.femoz.net \
   --port 27017 \
   --db video_watch_time \
+  --username ${VIDEO_WATCH_TIME_USERNAME} \
+  --password ${VIDEO_WATCH_TIME_PASSWORD} \
+  --authenticationDatabase ${VIDEO_WATCH_TIME_AUTHENTICATION_DATABASE} \
   --collection viewers \
   --file /docker-entrypoint-initdb.d/data/viewers.json \
   --jsonArray \
