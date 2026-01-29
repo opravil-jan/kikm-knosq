@@ -235,7 +235,7 @@ services:
       - config-server-02.femoz.net
       - config-server-03.femoz.net
 
-  haproxy:
+  haproxy.femoz.net:
     image: haproxy:2.9
     container_name: haproxy
     hostname: mongodb.femoz.net

@@ -976,6 +976,8 @@ db.devices.aggregate([
 #### Seznam 20 nejrozkoukanejsich serialu na ktere se divaji prihlaseni divaci
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
+
 db.viewers.aggregate([
   {
     $match: {
@@ -1010,6 +1012,8 @@ db.viewers.aggregate([
 #### Seznam uživatelů kteří nekoukali na žadné video za poslední rok
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
+
 const oneYearAgo = new Date();
 oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
@@ -1034,6 +1038,8 @@ db.viewers.aggregate([
 #### Celkový počet videi které sledovaly anonymní diváci a nedokoukali je. To jest updatedAt je starší než jeden měsíc
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
+
 const oneMonthAgo = new Date();
 oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
@@ -1053,6 +1059,8 @@ db.devices.aggregate([
 #### Kolik průměrně má přihlášený divák rozkoukaných videii za posledni 3 měsíce
 
 ```javascript
+db = db.getSiblingDB("video_watch_time");
+
 const threeMonthsAgo = new Date();
 threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
@@ -1115,7 +1123,70 @@ db = db.getSiblingDB("video_watch_time");
 db.devices.createIndex({ deviceId: 1, idec: 1 }, { unique: true });
 ```
 
+#### Query: Seznam deseti nejsledovanejsich videi anonymních diváků
 
+```javascript
+db.devices.createIndex(
+  { idec: 1 }
+);
+```
+
+#### Query: Počet zařízení na kterých se diváci nepřihlašují
+
+```javascript
+db = db.getSiblingDB("video_watch_time");
+
+db.viewers.createIndex(
+  { deviceId: 1 }
+);
+db.devices.createIndex(
+  { deviceId: 1 }
+);
+```
+
+#### Query: Seznam 20 nejrozkoukanejsich serialu na ktere se divaji prihlaseni divaci
+
+```javascript
+db = db.getSiblingDB("video_watch_time");
+
+db.viewers.createIndex(
+  { sidp: 1 },
+  { partialFilterExpression: { finished: false } }
+);
+```
+
+#### Query: Seznam uživatelů kteří nekoukali na žadné video za poslední rok
+
+```javascript
+db = db.getSiblingDB("video_watch_time");
+
+db.viewers.createIndex(
+  { userId: 1, updatedAt: -1 }
+);
+```
+
+#### Query: Celkový počet videi které sledovaly anonymní diváci a nedokoukali je. To jest updatedAt je starší než jeden měsíc
+
+```javascript
+db = db.getSiblingDB("video_watch_time");
+
+db.devices.createIndex(
+  { updatedAt: 1 },
+  { partialFilterExpression: { finished: false } }
+);
+```
+
+#### Query: Kolik průměrně má přihlášený divák rozkoukaných videii za posledni 3 měsíce
+
+```javascript
+db = db.getSiblingDB("video_watch_time");
+
+db.viewers.createIndex(
+  { updatedAt: 1, userId: 1 },
+  { partialFilterExpression: { finished: false } }
+);
+
+```
 
 ## 8. ZÁVĚR
 
