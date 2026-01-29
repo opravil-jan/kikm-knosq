@@ -58,12 +58,6 @@ db.createCollection("viewers", {
           maximum: 16,
           description: "'deviceId' must be a string and is required",
         },
-        deviceId: {
-          bsonType: "string",
-          minimum: 16,
-          maximum: 16,
-          description: "'deviceId' must be a string and is required",
-        },
         sidp: {
           bsonType: "long",
           minimum: 10000,
