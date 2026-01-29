@@ -26,6 +26,10 @@ docker compose down
 
 if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
 
+  if ! docker network inspect "container-network" >/dev/null 2>&1; then
+    docker network create "container-network"
+  fi
+  
   for DIRECTORY in "${DIRECTORIES[@]}"; do
     if [ -d "$DIRECTORY" ]; then
       echo "Deleting directory: $DIRECTORY"
