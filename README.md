@@ -307,10 +307,13 @@ Totals
 }
 ```
 
-                1.2.8. Zapezpečení
-                    Uveďte, jakým způsobem jste vyřešili zabezpečení databáze a proč?
-                    Minimálně je požadována autentizace a autorizace.
-                    Upozornění: V případě MongoDB je nutné mít keyfile.
+#### 1.2.8. Zapezpečení
+
+Zabezpečení databáze MongoDB je v rámci této semestrální práce řešeno pomocí **autentizace** a **autorizace uživatelů** a **zabezpečení interní komunikace mezi databázovými uzly**. Toto řešení odpovídá doporučenému postupu MongoDB pro provoz v clusterovém prostředí.
+
+Autentizace je realizována pomocí vestavěného uživatelského systému MongoDB. V databázi admin je vytvořen administrátorský uživatel cluster-admin s rolí root, který slouží výhradně pro správu databázového clusteru. Pro aplikační část je v databázi video_watch_time vytvořen samostatný uživatel pcm s rolí readWrite, který má přístup pouze k datům potřebným pro běh aplikace. Tím je zajištěna **autorizace** na základě rolí a dodržen princip minimálních oprávnění, kdy aplikace nemá administrátorská práva nad celým systémem.
+
+Vzhledem k tomu, že databáze běží v distribuovaném prostředí, je zabezpečena také **vzájemná komunikace mezi jednotlivými instancemi MongoDB**. K tomuto účelu je použit **keyfile**, který MongoDB využívá pro interní autentizaci uzlů v replica setu nebo shardovaném clusteru. Keyfile obsahuje sdílený tajný klíč, díky kterému si jednotlivé uzly ověřují svou důvěryhodnost a brání se neoprávněnému připojení cizí instance.
 
 ## 2. FUNKČNÍ ŘEŠENÍ
 
