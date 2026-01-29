@@ -584,28 +584,184 @@ MongoDB tedy představuje optimální kompromis mezi flexibilitou, výkonem a mo
 
 ## 4. VÝHODY A NEVÝHODY
 
-            Popište, jaké výhody a nevýhody má daná NoSQL databáze.
-            Uveďte, jaké výhody a nevýhody má Vaše řešení a proč?
+### MongoDB (obecně) – výhody a nevýhody
+
+#### Výhody
+
+MongoDB je dokumentová NoSQL databáze, která umožňuje ukládat data ve flexibilním JSON/BSON formátu bez nutnosti striktního relačního schématu. To urychluje vývoj, protože se model snadno přizpůsobuje změnám požadavků. Dobře se hodí pro práci s velkým množstvím dat a vysokou zátěží, nabízí výkonné indexování a nativně podporuje replikaci a horizontální škálování (sharding).
+
+#### Nevýhody
+
+Flexibilita schématu může vést k nekonzistentním datům, pokud se nepoužije validace. Ve srovnání s relačními DB bývá složitější udržet datovou integritu napříč více kolekcemi (např. vztahy a složité joiny), a některé analytické dotazy mohou být náročnější na návrh i výkon. U špatně navržených indexů nebo dotazů může rychle růst spotřeba paměti a diskového prostoru.
+
+### Navrhované řešení (sharding + replikace) – výhody a nevýhody a proč
+
+#### Výhody (proč)
+
+- Škálovatelnost: Díky shardingu lze data rozdělit mezi více uzlů a zvyšovat výkon i kapacitu přidáváním dalších serverů. To je vhodné pro růst objemu záznamů i počtu dotazů.
+
+- Dostupnost: Replikační sety zajišťují odolnost vůči výpadku uzlu – při selhání primárního uzlu proběhne volba nového a systém pokračuje bez zásadního dopadu.
+
+- Lepší rozložení zátěže: Rozdělení kolekcí (např. podle různých shard klíčů) pomáhá oddělit hotspoty a umožní optimalizovat výkon pro různé typy přístupů (např. podle userId vs. deviceId).
+
+#### Nevýhody (proč)
+
+- Vysoké hardwarové nároky pro produkční provoz: Produkční sharded cluster typicky vyžaduje více uzlů (shardy, config servery, routery mongos, replikace), což znamená vyšší náklady na CPU/RAM/disky a síť.
+
+- Vyšší provozní složitost: S rostoucím počtem uzlů roste náročnost správy (monitoring, zálohování, aktualizace, ladění shard klíčů, balancování chunků).
+
+- Citlivost na volbu shard klíče: Špatně zvolený shard key může způsobovat nerovnoměrné rozložení dat/zátěže (hotspoty) a výkonové problémy, které se pak řeší obtížně.
+
+- Komplexnější dotazy napříč shardy: Některé dotazy mohou být „scatter-gather“ (dotaz na více shardů), což zvyšuje latenci a zatížení clusteru.
 
 ## 5. DALŠÍ SPECIFIKA
 
-            Popis specifických vlastností řešení, pokud nejsou použity žádná specifika, pak uveďte, že vaše řešení je použito jak je doporučeno a nemá vlastní specifika (nic mu nechybí a ani mu nic nepřebývá).
+Navrhované řešení nemá žádná specifika a odpovídá standardím řešením dle dokumentace
 
 ## 6. DATA
 
+V aktuální verzi práce máš 2 kolekce každá obsahuje 1 000 000 dokumentů a tedy typicky i 2 datové soubory pro seed/import:
 
+- devices.json → anonymní diváci (podle zařízení)
+- viewers.json → přihlášení diváci (podle userId)
 
+### S jakými typy dat vaše databáze pracuje, jakého jsou formátu a jak s nimi databáze nakládá?
 
+**Databáze**: MongoDB
+**Kolekce**: devices (anonymní), viewers (přihlášení)
+**Import formát**: JSON (prakticky NDJSON pro mongoimport)
 
-            Použijte libovolné 3 datové soubory, kdy jeden soubor obsahuje alespoň 5 tis. záznamů.
-            Popis dat bude ve velké míře zpracován pomocí knihoven jazyka Python a dále bude doplněn dovysvětlujícími texty.
-            S jakými typy dat Vaše databáze pracuje, jakého jsou formátu a jak s nimi databáze nakládá?
-            Proč jste nezvolili další možné datové struktury pro Vaši databázi?
-            S kolika daty Vaše databáze bude pracovat? Jakého rozsahu jsou ukázková data?
-            Kolik obsahují prázdných hodnot?
-            Jaké úpravy jste s daty prováděli a proč?
-            Jaký je zdroj dat? Uveďte URL adresu.
-            Pomocí skriptů v Python s využitím knihoven Pandas, Numpy, apod. data popište a proveďte základní analýzu dat (základní statistiky - počty, prázdná pole, suma, průměr, grafické zobrazení, apod.
+#### devices – pole a typy (jen dle schématu)
+
+- deviceId – string (délka 16; required)
+- sidp – long (10000 až 20000000000)
+- idec – string (3–20; required)
+- progress – int (>= 0; required) – poslední čas sledování (sekundy)
+- finished – bool
+- createdAt – date
+- updatedAt – date
+
+#### viewers – pole a typy (jen dle schématu)
+
+- userId – binData (required) – identifikátor přihlášeného diváka
+- deviceId – string (délka 16)
+- sidp – long (10000 až 20000000000)
+- idec – string (3–20; required)
+- progress – int (>= 0; required)
+- finished – bool
+- createdAt – date
+- updatedAt – date
+
+### Jak s daty DB nakládá
+
+- MongoDB ukládá dokumenty jako BSON (typy jako date, binData, long jsou nativní).
+
+- Má zapnutou schema validation přes $jsonSchema, takže do kolekcí neprojde nevalidní dokument (typ, required pole, rozsahy).
+
+- Nevyužíváš vnořená data: dokumenty jsou “ploché”, což zrychluje čtení i indexaci a zjednodušuje dotazy.
+
+### Proč jste nezvolili další možné datové struktury pro Vaši databázi?
+
+Řešení míří na poměr výkon / složitost / provozní náklady.
+
+#### Proč dokumentová DB (MongoDB) v tomto scénáři dává smysl
+
+- Data jsou logicky “záznamy posledního stavu sledování” (device/user + idec + progress).
+
+- Potřebuješ jednoduchý rychlý zápis a rychlé čtení pro agregace (např. top idec podle počtu).
+
+- Plochý model bez vnoření = rychlost + jednoduchost.
+
+#### Proč ne relační DB
+
+- Pro tak velké objemy event-like dat a časté agregace by SQL řešení typicky vedlo k vysokým nárokům (indexy, joiny, údržba, scaling), případně ke komplikované architektuře.
+- Navíc rigidní schéma je méně flexibilní pro importy a validaci při různých variantách záznamů.
+- Dalším významným omezením relačních databází je nízká rychlost zápisu při vysoké zátěži.
+
+#### Proč ne Cassandra (a podobná řešení)
+
+Cassandra by šla použít, ale je extrémně složitá na návrh (modelování podle dotazů, kompakce, tuning) a produkční nasazení.
+
+### S kolika daty bude databáze pracovat? Jakého rozsahu jsou ukázková data?
+
+Ukázková data jsou ve stovkách MB:
+
+- viewers.json ~236 MB
+- devices.json ~165 MB
+
+Počet záznamů v každé kolekci je 1 000 000.
+
+V reálném provozu počítáme s ročním přírůstkem:
+
+- viewers 10 000 000
+- devices 7 000 000
+
+### Kolik obsahují prázdných hodnot?
+
+V rámci schématu platí:
+
+- povinná pole (required) nesmí být prázdná (deviceId/userId, idec, progress)
+- ostatní pole (sidp, deviceId u viewers, finished, createdAt, updatedAt) mohou chybět / být null podle toho, co export dodá
+
+Prázdné hodnoty tedy typicky uvidíš hlavně u:
+
+- finished
+- createdAt, updatedAt
+- sidp
+- deviceId (jen u viewers)
+
+Data byla analyzována pomocí vlastního Python skriptu empty-values.py, který zpracovává zdrojová JSON data a zjišťuje výskyt prázdných hodnot u jednotlivých polí definovaných ve schématu databáze. Výsledky této analýzy jsou uvedeny níže.
+
+#### devices.json
+
+- createdAt:  1000000
+- sidp:       33963
+- deviceId:   0
+- idec:       0
+- progress:   0
+- finished:   0
+- updatedAt:  0
+
+#### viewers.json
+
+- createdAt:  1000000
+- sidp:       7157
+- userId:     0
+- deviceId:   0
+- idec:       0
+- progress:   0
+- finished:   0
+- updatedAt:  0
+
+### Jaké úpravy jste s daty prováděli a proč?
+
+- Převod dat do formátu vhodného pro import (mongoimport)
+- Validace a čištění podle $jsonSchema
+- typy:
+  - progress int - chyby v datech kdy progress je menší než 0
+  - sidp long - správně zavést datový typ
+  
+    ```json
+    {"sidp":{"$numberLong":"14288838217"}}
+    ```
+  
+  - updatedAt date - správně označit string, že je typu date
+  
+    ```json
+    {"updatedAt":{"$date":"2025-07-18T17:16:16.555Z"}}
+    ```
+
+  - userId binData - určit subtyp binárních dat
+
+    ```json
+    {"userId":{"$uuid":"7318ff1f-ad73-4740-8177-9e47318dec2a"}}
+    ```
+
+  - Omezení extrémních hodnot progress - odebrání maximální délky videa ve schématu
+
+### Jaký je zdroj dat? Uveďte URL adresu.
+
+Zdroj dat je Elasticsearch, kde jsou data aktuálně ukládána z důvodu nižších hardwarových požadavků a protože je potřeba zvládat velký objem dat. V interním systému zaměstnavatele
 
 ## 7. DOTAZY
 
@@ -712,8 +868,6 @@ db.devices.aggregate([
     }
   }
 ])
-
-
 ```
 
 ### 7.2 Agregační funkce
@@ -817,6 +971,39 @@ db.devices.aggregate([
     $count: "uniqueDevicesInBoth"
   }
 ])
+```
+
+#### Seznam 20 nejrozkoukanejsich serialu na ktere se divaji prihlaseni divaci
+
+```javascript
+db.viewers.aggregate([
+  {
+    $match: {
+      finished: false
+    }
+  },
+  {
+    $group: {
+      _id: "$sidp",
+      idecCount: { $sum: 1 }
+    }
+  },
+  {
+    $sort: {
+      idecCount: -1
+    }
+  },
+  {
+    $limit: 20
+  },
+  {
+    $project: {
+      _id: 0,
+      sidp: "$_id",
+      idecCount: 1
+    }
+  }
+])
 
 ```
 
@@ -848,46 +1035,31 @@ db.devices.createIndex({ deviceId: 1, idec: 1 }, { unique: true });
 ```javascript
 db = db.getSiblingDB("video_watch_time")
 db.devices.createIndex({ deviceId: 1 })
+db.viewers.createIndex({ deviceId: 1 })
 ```
 
+#### Index pro zrychlení dotazu na rozkoukane seriály
 
+```javascript
+db.viewers.createIndex({ finished: 1, sidp: 1, idec: 1 })
+```
 
+## 8. ZÁVĚR
 
-            Uveďte a popište 30 NETRIVIÁLNÍCH různých navazujících příkladů včetně řešení (všechny tři datasety popisují jedno téma) a podrobného vysvětlení jednotlivých příkazů.
-                NETRIVIVÁLNÍ DOTAZ je například dotaz využívající v MongoDB aggregate a zároveň unwind a zároveň group a zároveň sort nebo například aggregate a zároveň lookup a zároveň match a zároveň project nebo aggregate a zároveň unset a zároveň ......
-                Příkazy řádně okomentujete tzn., že každý příkaz zkopírujete z konzole a u každého příkazu uvedete, jaké je jeho obecné chování a jak konkrétně pracuje s daty ve vašem případě a řeší konkrétní úlohu.
-                Předpoklad je takový, že budete mít příkazy z různých kategorií např.
-                    "práce s daty" - insert, update, delete, merge
-                    "agregační funkce",
-                    "konfigurace",
-                    "nested (embedded) dokumenty"
-                    "indexy"
-                    takových kategorií je požadováno alespoň 5, kdy u každé "kategorie" uvedete alespoň 6 příkazů.
-            Každý dotaz musí vracet nějaká data.
-            Každý dotaz musí vracet různá data. Nelze, aby stejná data vracelo více dotazů.
-            Dle zvoleného typu databáze využijte i možnost práce s clusterem, replikačním faktorem a shardingem.
-            Pokuste se například (mimo jiné) nasimulovat výpadek některého z uzlů a popište možnosti řešení.
-            Upozornění: V případě MongoDB je nutné mít validační schéma.
+Cílem této semestrální práce bylo navrhnout a ověřit řešení pro sběr, ukládání a vyhodnocování dat o sledovanosti videí s důrazem na škálovatelnost a práci s velkým objemem dat. Zvolené řešení bylo založeno na dokumentově orientované databázi MongoDB, distribuované architektuře a využití shardování pro horizontální škálování.
 
-# ZÁVĚR
+Na základě provedené analýzy, návrhu schémat, indexace a ukázkových dotazů lze konstatovat, že navržené řešení je funkční a vhodné pro daný typ problému. Umožňuje efektivně ukládat informace o zařízeních, uživatelích a jejich interakcích se sledovaným obsahem, a zároveň nad těmito daty provádět analytické dotazy, jako je zjišťování nejsledovanějších videí či identifikace neaktivních zařízení. Hloubka zpracování odpovídá požadavkům semestrální práce a zahrnuje nejen samotný návrh databáze, ale i úvahy nad shard klíči, indexací a distribucí dat.
 
-            V závěru pochvalně i kriticky zhodnoťte Vaši semestrální práci, popište hloubku zpracování. Shrňte k jakým závěrům jste došli, co je možné s Vaším řešením vykonávat, apod.
+Zásadním omezením navrženého řešení je však jeho **vysoká závislost na dostatečném množství hardwarových prostředků**. Aby bylo řešení skutečně robustní a schopné dlouhodobě ustát vysoký provoz a velký počet souběžných uživatelů, je nutné nasazení většího počtu shardů, replikačních uzlů a odpovídající síťové infrastruktury. Toto lze považovat za jediné, avšak klíčové omezení – bez adekvátního hardwaru by systém mohl narážet na výkonové limity.
 
-# ZDROJE
+Dalším aspektem, který lze hodnotit kriticky, je **komplikovanost dotazovacího jazyka MongoDB** oproti klasickému SQL. Především agregační pipeline může být pro vývojáře méně přehledná a hůře čitelná než ekvivalentní relační dotazy, zejména u složitějších analytických úloh. Na druhou stranu tento přístup nabízí vysokou flexibilitu a výkon při práci s rozsáhlými daty.
 
-            Uveďte řádně všechny zdroje, se kterými jste pracovali, abecedně seřazené, a to včetně použitých nástrojů.
+Je důležité zdůraznit, že tato semestrální práce představuje pouze simulaci reálného problému v omezeném akademickém kontextu. V produkčním nasazení, při dostatečném počtu hardwarových prostředků a správném nastavení architektury, je však navržené řešení schopné fungovat spolehlivě a robustně a zvládnout veškeré požadavky kladené na podobný systém v praxi.
 
-# PŘÍLOHY DOKUMENTACE
+## 9. ZDROJE
 
-            Data
-            složka pojmenovaná Data, která obsahuje:
-                obsahuje minimálně 3 datasety
-                obsahuje Python skript (JupyterLab)
-            Dotazy
-            složka pojmenovaná Dotazy, která obsahuje:
-                1 soubor se všemi dotazy, kdy každý dotaz obsahuje zadání v přirozeném jazyce a řešení v příslušeném jazyce vybrané NoSQL databáze
-            Funkční řešení
-            Složka pojmenovaná Funkční řešení, která obsahuje:
-                docker-compose.yml
-                skripty nutné pro zprovoznění
-                případně další složky a soubory nutné pro zprovoznění řešení
+- https://chatgpt.com
+- https://gemini.google.com
+- https://www.mongodb.com/docs
+- https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html
+- https://www.youtube.com/watch?v=LBthwZDRR-c&list=PL34sAs7_26wPvZJqUJhjyNtm7UedWR8Ps&index=2
