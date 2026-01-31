@@ -247,3 +247,45 @@ result = db.viewers
   .toArray();
 
 printjson(result);
+
+print("=== Kolik videí diváci viděly v jednotlivých měsících  ===");
+
+db.viewers
+  .aggregate([
+    // 1) Vybereme jen záznamy, které jsou opravdu dokoukané
+    //    a zároveň mají updatedAt uložené jako Date (kvůli práci s datem).
+    {
+      $match: {
+        finished: true,
+        updatedAt: { $type: "date" },
+      },
+    },
+
+    // 2) Seskupíme podle měsíce ve formátu YYYY-MM.
+    //    $dateToString převede Date na řetězec (např. "2026-01").
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: "%Y-%m", date: "$updatedAt" },
+        },
+        finishedVideosCount: { $sum: 1 },
+      },
+    },
+
+    // 3) Upravíme výstup: místo _id vrátíme čitelný název pole "month".
+    {
+      $project: {
+        _id: 0,
+        month: "$_id",
+        finishedVideosCount: 1,
+      },
+    },
+
+    // 4) Seřadíme chronologicky (řetězec YYYY-MM se řadí správně i lexikálně).
+    {
+      $sort: { month: 1 },
+    },
+  ])
+  .toArray();
+
+printjson(result);

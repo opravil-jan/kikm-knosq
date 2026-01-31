@@ -1244,10 +1244,47 @@ db.viewers.aggregate([
 
 ```
 
+#### Kolik videí diváci viděly v jednotlivých měsících
 
+```javascript
+db = db.getSiblingDB("video_watch_time");
 
+db.viewers.aggregate([
+  // 1) Vybereme jen záznamy, které jsou opravdu dokoukané
+  //    a zároveň mají updatedAt uložené jako Date (kvůli práci s datem).
+  {
+    $match: {
+      finished: true,
+      updatedAt: { $type: "date" }
+    }
+  },
 
-### xxx
+  // 2) Seskupíme podle měsíce ve formátu YYYY-MM.
+  //    $dateToString převede Date na řetězec (např. "2026-01").
+  {
+    $group: {
+      _id: {
+        $dateToString: { format: "%Y-%m", date: "$updatedAt" }
+      },
+      finishedVideosCount: { $sum: 1 }
+    }
+  },
+
+  // 3) Upravíme výstup: místo _id vrátíme čitelný název pole "month".
+  {
+    $project: {
+      _id: 0,
+      month: "$_id",
+      finishedVideosCount: 1
+    }
+  },
+
+  // 4) Seřadíme chronologicky (řetězec YYYY-MM se řadí správně i lexikálně).
+  {
+    $sort: { month: 1 }
+  }
+]).toArray();
+```
 
 ### 7.3 Konfigurace
 
@@ -1257,7 +1294,31 @@ db.viewers.aggregate([
 db = db.getSiblingDB("video_watch_time");
 
 db.devices.getShardDistribution()
+```
 
+#### Kontrola zda je balancing chanků aktivní a zda probíhá migrace chanků 
+
+```javascript
+db = db.getSiblingDB("video_watch_time");
+
+sh.isBalancerRunning()
+sh.getBalancerState()
+```
+
+### Cluster information
+
+```javascript
+db.serverBuildInfo()
+```
+
+#### Nastavení shardingu
+
+```javascript
+db.devices.createIndex({ deviceId: "hashed" });
+sh.shardCollection("video_watch_time.devices", { deviceId: "hashed" });
+
+db.viewers.createIndex({ userId: "hashed" });
+sh.shardCollection("video_watch_time.viewers", { userId: "hashed" });
 ```
 
 ### 7.5 Indexy
@@ -1335,6 +1396,15 @@ db.viewers.createIndex(
   { partialFilterExpression: { finished: false } }
 );
 
+```
+
+#### Query: Kolik videí diváci viděly v jednotlivých měsících
+
+```javascript
+db.viewers.createIndex(
+  { updatedAt: 1 },
+  { partialFilterExpression: { finished: true } }
+);
 ```
 
 ## 8. ZÁVĚR
