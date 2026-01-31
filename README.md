@@ -335,36 +335,87 @@ Adresářová struktura projektu je následující:
 
 ```console
 
-├── data -> storage/net/femoz/cluster-init/docker-entrypoint-initdb.d/data
+├── data
+│   ├── devices.json
+│   └── viewers.json
 ├── doc
+│   ├── architecture.drawio
+│   ├── architecture.svg
+│   └── case-studies
+│       ├── fz-sports.md
+│       ├── mediastream.md
+│       └── mingu.md
+├── docker-compose.yml
+├── dotazy
+│   ├── queries.js
+│   └── run.sh
+├── funkcni-reseni
+│   ├── 01-config-rs-init.js
+│   ├── 02-shard-01-rs-init.js
+│   ├── 02-shard-02-rs-init.js
+│   ├── 02-shard-03-rs-init.js
+│   ├── 03-create-cluster-admin.js
+│   ├── 04-mongos-add-shards.js
+│   ├── 05-db-collections-validators.js
+│   ├── 06-db-enable-sharding.js
+│   ├── 07-db-users.js
+│   ├── docker-compose.yml -> /home/opravil/Projects/school/uhk/kikm-knosq/semester-project/docker-compose.yml
+│   ├── empty-vaules.py
+│   └── start.sh -> /home/opravil/Projects/school/uhk/kikm-knosq/semester-project/start.sh
+├── README.md
+├── start.sh
 ├── storage
-│   └── net
-│       └── femoz
-│           ├── cluster-init
-│           │   ├── docker-entrypoint-initdb.d
-│           │   │   └── data
-│           │   └── scripts
-│           ├── config-server-01
-│           │   └── data/configdb
-│           ├── config-server-02
-│           │   └── data/configdb
-│           ├── config-server-03
-│           │   └── data/configdb
-│           ├── haproxy
-│           │   └── usr/local/etc/haproxy
-│           ├── mongos-01
-│           │   └── data/db
-│           ├── mongos-02
-│           │   └── data/db
-│           ├── shard-01-a
-│           ├── shard-01-b
-│           ├── shard-01-c
-│           ├── shard-02-a
-│           ├── shard-02-b
-│           ├── shard-02-c
-│           ├── shard-03-a
-│           ├── shard-03-b
-│           └── shard-03-c
+│   └── net
+│       └── femoz
+│           ├── config-server-01
+│           │   └── data
+│           │       └── configdb
+│           ├── config-server-02
+│           │   └── data
+│           │       └── configdb
+│           ├── config-server-03
+│           │   └── data
+│           │       └── configdb
+│           ├── haproxy
+│           │   └── usr
+│           │       └── local
+│           │           └── etc
+│           │               └── haproxy
+│           │                   └── haproxy.cfg
+│           ├── mongo-keyfile
+│           ├── mongos-01
+│           │   └── data
+│           │       └── db
+│           ├── mongos-02
+│           │   └── data
+│           │       └── db
+│           ├── shard-01-a
+│           │   └── data
+│           │       └── db
+│           ├── shard-01-b
+│           │   └── data
+│           │       └── db
+│           ├── shard-01-c
+│           │   └── data
+│           │       └── db
+│           ├── shard-02-a
+│           │   └── data
+│           │       └── db
+│           ├── shard-02-b
+│           │   └── data
+│           │       └── db
+│           ├── shard-02-c
+│           │   └── data
+│           │       └── db
+│           ├── shard-03-a
+│           │   └── data
+│           │       └── db
+│           ├── shard-03-b
+│           │   └── data
+│           │       └── db
+│           └── shard-03-c
+│               └── data
+│                   └── db
 
 ```
 
@@ -373,12 +424,6 @@ Adresářová struktura projektu je následující:
 - storage/net/femoz/
 
     Hlavní adresář pro persistentní data jednotlivých MongoDB uzlů.
-
-- cluster-init/
-
-    Obsahuje skripty a inicializační data, která jsou spuštěna automaticky po startu clusteru:
-  - scripts/init-cluster.sh – skript pro inicializaci replica setů, shardů a jejich připojení
-  - docker-entrypoint-initdb.d/data – ukázková data pro naplnění databáze
 
 - config-server-*
 
@@ -442,77 +487,178 @@ HAProxy slouží jako externí vstupní bod pro klienty:
 - Směruje provoz na mongos uzly
 - Umožňuje jednoduché přepínání a rozšíření clusteru
 
-##### Inicializační kontejner (cluster-init)
-
-Speciální kontejner cluster-init:
-
-- Spouští skript init-cluster.sh automaticky po startu ostatních služeb
-
-- Inicializuje:
-  - replica sety
-  - přidání shardů do clusteru
-  - vytvoření databází a kolekcí
-- Řídí se proměnnými z .env souboru
-
-Tento přístup odpovídá doporučenému postupu automatického spouštění skriptů po startu kontejnerů.
-
 ### 2.2. Instalace
 
-#### Požadavky
+#### Získání projektu z Git repozitáře
 
-- Docker
-- Docker Compose
-- Linux / macOS (řešení je testováno primárně na Linuxu)
+Celý projekt je uložen v Git repozitáři. Nejdřív je nutné jej naklonovat:
 
-#### Postup instalace
-
-##### 1. Naklonování repozitáře
-
-```console
-git clone https://github.com/opravil-jan/kikm-knosq.git
+```bash
+git clone https://github.com/opravil-jan/kikm-knosq
 cd kikm-knosq
 ```
 
-##### 2. Nastavení proměnných prostředí
+#### Požadavky na prostředí
 
-V souboru .env lze řídit chování inicializace clusteru, např.:
+Řešení je určené pro Linux CLI, kde je nainstalovaný:
 
-```console
-CLUSTER_INIT_ENABLED=1
+- Docker
+- Docker Compose (příkaz docker compose ...)
+
+Dále projekt využívá soubor .env, ve kterém jsou uložené přihlašovací údaje a přepínač inicializace clusteru.
+
+#### Spuštění řešení – maximálně automatizovaně jedním příkazem
+
+Spuštění je navržené tak, aby uživatel nemusel ručně spouštět jednotlivé init skripty pro MongoDB (replika sety, sharding, uživatelé, import dat). Vše obstará jeden spouštěcí skript:
+
+```bash
+bash start.sh
 ```
 
-##### 3. Spuštění projektu
+Tento skript je „orchestrátor“: spustí docker compose, počká na naběhnutí kontejnerů a poté automaticky provede veškerou inicializaci clusteru.
 
-Projekt se spouští výhradně pomocí skriptu start.sh:
+#### Jak start.sh funguje a co přesně automatizuje
 
-```console
-./start.sh
+#### Načtení konfigurace
 
+Na začátku se načtou proměnné ze souboru .env:
+
+- přihlašovací údaje pro admin účet clusteru (CLUSTER_ADMIN_*)
+- přihlašovací údaje pro aplikační DB uživatele (VIDEO_WATCH_TIME_*)
+- přepínač inicializace: CLUSTER_INIT_ENABLED
+
+Skript díky tomu nemusí mít citlivé údaje natvrdo v kódu a je opakovatelný.
+
+#### Vypnutí běžícího prostředí
+
+start.sh nejdřív provede:
+
+```bash
+docker compose down --remove-orphans
 ```
 
-#### Funkce skriptu start.sh
+Tím se zajistí čistý start a odstranění případných “sirotků” z předchozích běhů.
 
-Skript provádí následující kroky:
+#### První start vs. opakovaný start (CLUSTER_INIT_ENABLED)
 
-1. Načte proměnné prostředí ze souboru .env
+Skript rozlišuje dva režimy:
 
-2. Zastaví běžící kontejnery (docker compose down)
+- První inicializace clusteru: CLUSTER_INIT_ENABLED=1 (výchozí)
+- Běžné spuštění bez reinicializace: CLUSTER_INIT_ENABLED=0
 
-3. Pokud je povolena inicializace (CLUSTER_INIT_ENABLED=1):
-    - vytvoří docker network pokud neexistuje
-    - smaže stará data shardů a config serverů
-    - vytvoří čisté adresáře pro nový cluster
+To je důležité, protože cluster se při prvním startu nastavuje (replika sety, sharding, uživatelé, import dat), ale při dalších startech se už data nemažou.
 
-4. Spustí celý cluster pomocí:
+##### Režim 1: Inicializace clusteru (CLUSTER_INIT_ENABLED=1)
 
-    ```code
-    docker compose up -d
-    ```
+Pokud je inicializace zapnutá, skript provede kompletní “bootstrap” clusteru:
 
-Díky tomuto přístupu je možné:
+###### Vygeneruje MongoDB keyfile (interní autentizace)
 
-- cluster kompletně znovu inicializovat
-- nebo jej spustit bez zásahu do existujících dat
+- smaže starý mongo-keyfile
+- vygeneruje nový pomocí openssl rand
+- nastaví vlastníka a práva (chown 999:999, chmod 400)
+
+Keyfile je nutný pro bezpečnou komunikaci uzlů v replica setech.
+
+###### Vytvoří docker síť
+
+Pokud neexistuje síť container-network, skript ji vytvoří. Tato síť se používá pro:
+
+- komunikaci všech MongoDB kontejnerů mezi sebou,
+- dočasné utility kontejnery (mongo, mongosh, mongoimport), které provádí init a import.
+
+###### Reset perzistentních datových adresářů
+
+Skript má seznam adresářů (DIRECTORIES), které patří jednotlivým komponentám:
+
+- config servery (configdb)
+- mongos routery
+- shard replika sety (data/db)
+
+Při prvním startu se:
+
+- případné staré adresáře smažou (rm -rf)
+- znovu vytvoří (mkdir -p)
+
+Tím je zaručeno, že první inicializace vždy probíhá z čistého stavu.
+
+###### Spuštění kontejnerů přes docker-compose
+
+Skript spustí celé prostředí:
+
+```bash
+docker compose up -d
+```
+
+Tady se naplňuje požadavek, že řešení běží v Dockeru a základní topologii spouští docker-compose.yml.
+
+###### Automatické spuštění init kroků až po startu kontejnerů
+
+Protože kontejnery mohou nabíhat postupně, skript používá funkci wait_for_mongo(), která:
+
+- opakovaně volá mongosh a pingá db.runCommand({ ping: 1 })
+- čeká, dokud uzel skutečně nezačne odpovídat
+
+To je praktická realizace principu “spusť skripty až po startu služeb” (jako v uvedeném článku) – jen s tím rozdílem, že čekání a pořadí init kroků řídí start.sh, aby vše proběhlo deterministicky.
+
+###### Inicializace replica setů
+
+Jakmile jsou uzly dostupné, skript provede init:
+
+- Config replica set: 01-config-rs-init.js
+- Shard replica sety:
+  - 02-shard-01-rs-init.js
+  - 02-shard-02-rs-init.js
+  - 02-shard-03-rs-init.js
+
+Tyto skripty jsou součástí repozitáře (adresář funkcni-reseni/) a jsou spouštěné automaticky.
+
+###### Vytvoření cluster admin účtu
+
+Po založení replica setu config serverů se spustí:
+
+- 03-create-cluster-admin.js
+
+Tím vznikne administrátor, který se používá pro další kroky na úrovni clusteru (sharding, správa uživatelů).
+
+###### Dokončení konfigurace přes mongos router
+
+Po naběhnutí mongos se provedou kroky:
+
+- přidání shardů do clusteru: 04-mongos-add-shards.js
+- vytvoření kolekcí + validátorů: 05-db-collections-validators.js
+- zapnutí shardingu a indexy: 06-db-enable-sharding.js
+- vytvoření aplikačních uživatelů: 07-db-users.js
+
+Tyto skripty se spouští v dočasném mongo kontejneru v rámci stejné Docker sítě – tím není potřeba mít lokálně nainstalovaný MongoDB klient.
+
+###### Import dat
+
+Nakonec se automaticky importují data z adresáře data/:
+
+- devices.json → kolekce video_watch_time.devices
+- viewers.json → kolekce video_watch_time.viewers
+
+Import probíhá přes mongoimport opět v dočasném mongo kontejneru, takže uživatel nemusí nic instalovat ručně.
+
+###### Vypnutí init režimu po úspěchu
+
+Aby se inicializace nespouštěla při každém startu, skript na konci přepíše .env:
+
+- CLUSTER_INIT_ENABLED=0
+
+Tím je zajištěno, že další spuštění jen nastartuje kontejnery a data zůstanou zachována.
+
+##### Režim 2: Opakované spuštění (CLUSTER_INIT_ENABLED=0)
+
+Pokud je CLUSTER_INIT_ENABLED=0, skript:
+
+- nemaže datové adresáře,
+- negeneruje nový keyfile,
+- znovu neinicializuje replica sety ani sharding,
+- pouze spustí prostředí přes docker compose up -d.
+
+To odpovídá běžnému provozu, kdy se databáze jen zapíná/vypíná, ale konfigurace zůstává stejná.
 
 #### Shrnutí
 
