@@ -208,3 +208,5 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
   log "DONE" "Cluster initialization completed successfully."
 
 fi
+
+#pip install pandas numpy ijson matplotlib

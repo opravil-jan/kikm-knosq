@@ -115,11 +115,6 @@ Zvolená architektura tak představuje vědomý kompromis mezi:
 
 - a efektivním využitím hardwarových a provozních prostředků.
 
-                1.2.3. Uzly
-                    Minimálně 3.
-                    Uveďte kolik nodů používáte a proč?
-                    Uveďte řádný popis.
-
 #### 1.2.4 Sharding/Partitioning
 
 V rámci této semestrální práce je databázový systém **MongoDB** provozován v **sharded clusteru** složeném z **minimálně tří shardů**. Každý shard je realizován jako **Replica Set**, což zajišťuje vysokou dostupnost dat a odolnost vůči výpadkům jednotlivých uzlů.
@@ -881,6 +876,39 @@ Data byla analyzována pomocí vlastního Python skriptu empty-values.py, který
 - progress:   0
 - finished:   0
 - updatedAt:  0
+
+### Unikátní hodnoty userId / deviceId, idec, sidp
+
+#### devices.json
+
+- 402 966 unikátních zařízení (deviceId),
+- 49 592 unikátních identifikátorů obsahu (idec),
+- 7 360 unikátních hodnot sidp.
+
+#### viewers.json
+
+- 65 996 unikátních uživatelů (userId),
+- 92 333 unikátních zařízení (deviceId),
+- 73 925 unikátních identifikátorů obsahu (idec),
+- 9 602 unikátních hodnot sidp.
+
+### Stav dokončení sledování
+
+#### devices.json
+
+- 43,7 % záznamů má hodnotu true,
+- 56,3 % záznamů má hodnotu false.
+
+#### viewers.json
+
+- 69,6 % záznamů má hodnotu true,
+- 30,4 % záznamů má hodnotu false.
+
+### Rozležení sledovanosti podle měsíců
+
+![Rozkoukanost anonymn9ch diváků](./report/devices_monthly_idec_count.png)
+
+![Roykoukanost přihlášených diváků](./report/viewers_monthly_idec_count.png)
 
 ### Jaké úpravy jste s daty prováděli a proč?
 
