@@ -1454,3 +1454,5 @@ Je důležité zdůraznit, že tato semestrální práce představuje pouze simu
 - https://www.mongodb.com/docs
 - https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html
 - https://www.youtube.com/watch?v=LBthwZDRR-c&list=PL34sAs7_26wPvZJqUJhjyNtm7UedWR8Ps&index=2
+- https://docs.python.org/3/
+- https://docs.docker.com/
