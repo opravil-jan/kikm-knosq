@@ -20,10 +20,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27019 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   config-server-02.femoz.net:
@@ -46,10 +46,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27019 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   config-server-03.femoz.net:
@@ -72,10 +72,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27019 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   # -------- SHARD 01 (replSet shard-01) --------
@@ -99,10 +99,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   shard-01-b.femoz.net:
@@ -125,10 +125,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   shard-01-c.femoz.net:
@@ -151,10 +151,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   # -------- SHARD 02 (replSet shard2RS) --------
@@ -178,10 +178,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
       
   shard-02-b.femoz.net:
@@ -204,10 +204,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   shard-02-c.femoz.net:
@@ -230,10 +230,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   # -------- SHARD 03 (replSet shard-03) --------
@@ -257,10 +257,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   shard-03-b.femoz.net:
@@ -283,10 +283,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   shard-03-c.femoz.net:
@@ -309,10 +309,10 @@ services:
       - --keyFile 
       - /etc/mongo/keyfile
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
+      test: ["CMD-SHELL", "mongosh --port 27018 --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   # -------- MONGOS ROUTER --------
@@ -341,7 +341,7 @@ services:
       test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   mongos-02.femoz.net:
@@ -369,7 +369,7 @@ services:
       test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1 >/dev/null"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
       start_period: 30s
 
   haproxy.femoz.net:

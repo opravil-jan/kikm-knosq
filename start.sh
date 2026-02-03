@@ -108,7 +108,7 @@ if [ "${CLUSTER_INIT_ENABLED:-1}" -eq 1 ]; then
   log "SHARD-03" "Initializing shard-03 replica set"
   docker exec -i shard-03-a mongosh --host 127.0.0.1 --port 27018 --quiet < ./funkcni-reseni/02-shard-03-rs-init.js >> /dev/null 2>&1
 
-  log "CONFIG" "Creating cluster admin account"
+  log "CONFIG" "Creating cluster-admin account"
   docker exec -i config-server-01 mongosh --host 127.0.0.1 --port 27019 --quiet < ./funkcni-reseni/03-create-cluster-admin.js >> /dev/null 2>&1
 
   log "BOOT" "Waiting for mongos routers..."
